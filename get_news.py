@@ -9,18 +9,17 @@ async def get29ru():
     data = await sesh.get('https://29.ru/text/');
     titlesData = data.html.find('article h2');
     imagesData = data.html.find('article img');
+    datesData = data.html.find('article .KJs-');
     images = [];
     for img in imagesData:
         images.append(img.attrs['src'])
     titles=[];
     for title in titlesData:
         titles.append(title.text)
-    combined=[];
-    for indexi, title in enumerate(titles):
-        for indexj, img in enumerate(images):
-            if(indexi==indexj):
-                item = {'title': title, 'image': img}
-                combined.append(item)
+    dates =[];
+    for date in datesData:
+        dates.append(date.text)
+    combined = [{'title': title, 'image': img, 'date': date} for title, img, date in zip(titles, images, dates)]
     return combined;
 async def get_arhdrama():
     data = await sesh.get('https://arhdrama.culture29.ru/afisha/tickets/');
@@ -43,7 +42,7 @@ async def get_arhdrama():
 # results = sesh.run(get29ru, get_arhdrama);
 results = sesh.run(get29ru);
 
-#ssh
+# ssh
 ssh = paramiko.SSHClient();
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
 ssh.connect('nwsggr.beget.tech', username='nwsggr');
@@ -56,12 +55,16 @@ try:
     for result in results:
         with connection.cursor() as cursor:
             for elem in result:
-                sql = "INSERT INTO 29ru (newsTitle, newsImage) VALUES ('"+ elem.get('title')+"', '"+elem.get('image')+"');"
+                sql = "INSERT INTO 29ru (newsTitle, newsImage, newsDate) VALUES ('"+ elem.get('title')+"', '"+elem.get('image')+"', '"+elem.get('date')+"');"
                 cursor.execute(sql)
                 connection.commit()
 finally:
     connection.close()
     ssh.close();
+
+
+
+
 
 # for index, result in enumerate(results):
 #     print(result)
