@@ -9,17 +9,17 @@ async def get29ru():
     data = await sesh.get('https://29.ru/text/');
     titlesData = data.html.find('article h2');
     imagesData = data.html.find('article img');
-    datesData = data.html.find('article .KJs-');
+    articlesData = data.html.find('article>a');
     images = [];
     for img in imagesData:
         images.append(img.attrs['src'])
     titles=[];
     for title in titlesData:
         titles.append(title.text)
-    dates =[];
-    for date in datesData:
-        dates.append(date.text)
-    combined = [{'title': title, 'image': img, 'date': date} for title, img, date in zip(titles, images, dates)]
+    links=[];
+    for article in articlesData:
+        links.append(next(iter(article.absolute_links)))
+    combined = [{'title': title, 'image': img, 'url': link} for title, img, link in zip(titles, images, links)]
     return combined;
 async def get_arhdrama():
     data = await sesh.get('https://arhdrama.culture29.ru/afisha/tickets/');
@@ -55,7 +55,7 @@ try:
     for result in results:
         with connection.cursor() as cursor:
             for elem in result:
-                sql = "INSERT INTO 29ru (newsTitle, newsImage, newsDate) VALUES ('"+ elem.get('title')+"', '"+elem.get('image')+"', '"+elem.get('date')+"');"
+                sql = "INSERT INTO Test29 (newsTitle, newsImg, newsURL) VALUES ('"+ elem.get('title')+"', '"+elem.get('image')+"', '"+elem.get('url')+"');"
                 cursor.execute(sql)
                 connection.commit()
 finally:

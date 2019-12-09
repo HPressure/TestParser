@@ -1,12 +1,16 @@
-import paramiko;
-import pymysql;
+from requests_html import AsyncHTMLSession;
 
-ssh = paramiko.SSHClient();
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy());
-ssh.connect('nwsggr.beget.tech', username='nwsggr');
-# stdin, stdout, stderr = ssh.exec_command('ls');
-# for line in stdout:
-#     print('... ' + line.strip('\n'));
+sesh = AsyncHTMLSession(verify=False);
+async def get29ru():
+    data = await sesh.get('https://29.ru/text/');
+    articlesData = data.html.find('article>a');
+    links=[]
+    for article in articlesData:
+        links.append(article.absolute_links)
 
-connection = pymysql.connect(host='nwsggr.beget.tech', user='nwsggr_bd', passwd='123456', db='nwsggr_bd');
+    return links;
 
+results = sesh.run(get29ru);
+for result in results:
+    for item in result:
+        print(item)
