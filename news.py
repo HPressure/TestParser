@@ -4,7 +4,7 @@ import paramiko;
 import pymysql;
 
 sesh = AsyncHTMLSession(verify=False);
-async def get29ru():
+async def get_29ru():
     data = await sesh.get('https://29.ru/text/');
     titlesData = data.html.find('article h2');
     imagesData = data.html.find('article img');
@@ -21,26 +21,8 @@ async def get29ru():
     combined = [{'title': title, 'image': img, 'url': link} for title, img, link in zip(titles, images, links)]
     return combined;
 
-async def get_arhdrama():
-    data = await sesh.get('https://arhdrama.culture29.ru/afisha/tickets/');
-    titlesData = data.html.find('.c-card-ticket_title');
-    datesData = data.html.find('.c-card-ticket_date');
-    titles=[];
-    for title in titlesData:
-        titles.append(title.text)
-    dates = [];
-    for date in datesData:
-        dates.append(re.sub(u'[^А-Яа-яA-Za-z0-9:\s]*', u'', date.text))
-    combined = [];
-    for indexi, title in enumerate(titles):
-        for indexj, date in enumerate(dates):
-            if (indexi == indexj):
-                item = {'title': title, 'date': date}
-                combined.append(item)
-    return combined;
-
 # results = sesh.run(get29ru, get_arhdrama);
-results = sesh.run(get29ru);
+results = sesh.run(get_29ru);
 
 # ssh
 ssh = paramiko.SSHClient();
