@@ -1,5 +1,4 @@
 from requests_html import AsyncHTMLSession;
-import json;
 import re;
 import paramiko;
 import pymysql;
@@ -21,6 +20,7 @@ async def get29ru():
         links.append(next(iter(article.absolute_links)))
     combined = [{'title': title, 'image': img, 'url': link} for title, img, link in zip(titles, images, links)]
     return combined;
+
 async def get_arhdrama():
     data = await sesh.get('https://arhdrama.culture29.ru/afisha/tickets/');
     titlesData = data.html.find('.c-card-ticket_title');
@@ -54,6 +54,8 @@ connection = pymysql.connect(host='nwsggr.beget.tech', user='nwsggr_bd', passwd=
 try:
     for result in results:
         with connection.cursor() as cursor:
+            clear = 'TRUNCATE TABLE Test29';
+            cursor.execute(clear)
             for elem in result:
                 sql = "INSERT INTO Test29 (newsTitle, newsImg, newsURL) VALUES ('"+ elem.get('title')+"', '"+elem.get('image')+"', '"+elem.get('url')+"');"
                 cursor.execute(sql)
@@ -62,12 +64,3 @@ finally:
     connection.close()
     ssh.close();
 
-
-
-
-
-# for index, result in enumerate(results):
-#     print(result)
-    # with open('./data' + str(index) + '.json', 'w') as fout:
-    #     json.dump(result, fout);
-    #     fout.close();
