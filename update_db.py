@@ -53,7 +53,7 @@ async def get_arhdrama():
     for buyLink in buyLinksData:
         buyLinks.append(next(iter(buyLink.absolute_links)));
 
-    combined = [{'title': title, 'description': description, 'date': date, 'hour': hour, 'url': buyLink, 'image': img} for title, description, date, hour, buyLink, img in zip(titles, descriptions, dates, hours, buyLinks, images)]
+    combined = [{'title': title, 'description': description, 'date': date, 'hour': hour, 'buyUrl': buyLink, 'url': link, 'image': img} for title, description, date, hour, buyLink, link, img in zip(titles, descriptions, dates, hours, buyLinks, links, images)]
     return combined;
 
 # results = sesh.run(get29ru, get_arhdrama);
@@ -83,9 +83,9 @@ try:
                 clear = 'TRUNCATE TABLE ArhDrama';
                 cursor.execute(clear)
                 for elem in result:
-                    sql = "INSERT INTO ArhDrama (Title, Description, Img, BuyUrl, Date, Hour) VALUES ('" + elem.get(
+                    sql = "INSERT INTO ArhDrama (Title, Description, Img, BuyUrl, Url, Date, Hour) VALUES ('" + elem.get(
                         'title') + "', '" + elem.get('description') + "', '" + elem.get('image') + "', '" + elem.get(
-                        'url') + "', '" + elem.get('date') + "', '" + elem.get('hour') + "');"
+                        'buyUrl') + "', '" + elem.get('url') + "', '" + elem.get('date') + "', '" + elem.get('hour') + "');"
                     cursor.execute(sql)
                     connection.commit()
 finally:
